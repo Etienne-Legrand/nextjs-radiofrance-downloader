@@ -1,5 +1,4 @@
 import { NextRequest, NextResponse } from "next/server";
-import * as cheerio from "cheerio";
 import { Podcast } from "@/app/types/podcast";
 
 export async function GET(req: NextRequest) {
@@ -24,11 +23,12 @@ export async function GET(req: NextRequest) {
     }
     const html = await response.text();
 
-    // Étape 2 : Extraire l'ID de diffusion depuis la balise <meta>
-    const $ = cheerio.load(html);
-    const metaContent = $('meta[property="al:ios:url"]').attr("content");
-    const diffusionIdMatch = metaContent?.match(/diffusionId=([\w-]+)/);
-    const diffusionId = diffusionIdMatch ? diffusionIdMatch[1] : null;
+    // Étape 2 : Extraire l'ID de diffusion depuis la balise <meta> ou script
+    // Exemple : diffusionId=E8f34747-663d-4a2e-acea-96224bd193a6
+    // Exemple : diffusionId:"E8f34747-663d-4a2e-acea-96224bd193a6"
+    const diffusionIdRegex = /diffusionId[=:]["']?([\w-]+)["']?/i;
+    const match = diffusionIdRegex.exec(html);
+    const diffusionId = match?.[1] ?? null;
 
     if (!diffusionId) {
       return NextResponse.json(

@@ -3,14 +3,9 @@
 import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import Image from "next/image";
+import { Podcast } from "@/app/types/podcast";
 
-interface PodcastInfo {
-  name: string;
-  imageUrl: string;
-  audioUrl: string;
-}
-
-async function fetchPodcast(url: string): Promise<PodcastInfo> {
+async function fetchPodcast(url: string): Promise<Podcast> {
   const response = await fetch(`/api/podcast?url=${encodeURIComponent(url)}`);
   if (!response.ok) {
     throw new Error("Le podcast est introuvable.");
@@ -27,7 +22,7 @@ export default function PodcastPage() {
     isError,
     error,
     refetch,
-  } = useQuery<PodcastInfo, Error>({
+  } = useQuery<Podcast, Error>({
     queryKey: ["podcast", url],
     queryFn: () => fetchPodcast(url),
     enabled: false, // La requête ne se lance que lorsque `refetch()` est appelé
@@ -72,11 +67,11 @@ export default function PodcastPage() {
 
         {podcast && (
           <div className="space-y-4">
-            <h1 className="text-2xl font-bold text-center">{podcast.name}</h1>
+            <h1 className="text-2xl font-bold text-center">{podcast.title}</h1>
             <div className="relative w-full h-64">
               <Image
                 src={podcast.imageUrl}
-                alt={podcast.name}
+                alt={podcast.title}
                 fill
                 className="rounded-lg object-cover"
                 priority

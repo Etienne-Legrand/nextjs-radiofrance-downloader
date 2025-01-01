@@ -41,7 +41,6 @@ export async function GET(req: NextRequest) {
     const apiResponse = await fetch(
       `https://www.radiofrance.fr/api/expressions?ids=${diffusionId}`
     );
-    console.log("API response:", apiResponse);
     if (!apiResponse.ok) {
       return NextResponse.json(
         { error: "Failed to fetch podcast data from the API" },
@@ -63,6 +62,10 @@ export async function GET(req: NextRequest) {
       title: podcastData.title || "Untitled Podcast",
       imageUrl: podcastData.visual?.webpSrc || "",
       audioUrl: podcastData.playerInfo?.media?.sources?.[0]?.url || "",
+      playlistImageUrl:
+        podcastData.playerInfo?.playerMetadata?.cover?.src || "",
+      playlistTitle: podcastData.playerInfo?.playerMetadata?.firstLine || "",
+      playlistUrl: `https://radiofrance.fr/${podcastData.playerInfo?.playerMetadata?.firstLinePath}`,
     };
 
     if (!podcast.audioUrl) {
